@@ -1,13 +1,10 @@
 package com.bignerdranch.android.photogallery;
 
-import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +26,7 @@ public class PhotoGalleryFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
     private List<GalleryItem> mItems = new ArrayList<GalleryItem>();
+    private ThumbnailDownloader<PhotoHolder> mThumbnailDownloader;
 
     public static PhotoGalleryFragment newInstance(){
         return new PhotoGalleryFragment();
@@ -40,6 +37,11 @@ public class PhotoGalleryFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         new FetchItemsTask().execute();
+
+        mThumbnailDownloader = new ThumbnailDownloader<>();
+        mThumbnailDownloader.start();
+        mThumbnailDownloader.getLooper();
+        Log.i(TAG, "ThumbnailDownloader Thread started..");
     }
 
     @Nullable
@@ -50,6 +52,13 @@ public class PhotoGalleryFragment extends Fragment {
         mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),3));
         setupAdapter();
         return v;
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        mThumbnailDownloader.quit();
+        Log.i(TAG, "ThumbnailDownloader Thread destroyed..");
     }
 
     public void setupAdapter(){
@@ -75,13 +84,18 @@ public class PhotoGalleryFragment extends Fragment {
     private class PhotoHolder extends RecyclerView.ViewHolder {
         //private TextView mTitleTextView;
         private ImageView mImageView;
+        private TextView mTitleTextView;
 
         public PhotoHolder(View view){
             super(view);
             mImageView = (ImageView) view.findViewById(R.id.fragment_photo_gallery_recycler_view);
+            mTitleTextView = (TextView)view.findViewById(R.id.fragment_photo_gallery_text_view);
         }
-        public void bindDrawable(Drawable drawable){
-            mImageView.setImageDrawable(drawable);
+        public void bindDrawable(Drawable drawable, String title){
+            if(drawable != null)
+                mImageView.setImageDrawable(drawable);
+            mTitleTextView.setText(title);
+            Log.d(TAG, "title : "+title);
         }
     }
 
@@ -103,9 +117,10 @@ public class PhotoGalleryFragment extends Fragment {
         public void onBindViewHolder(PhotoHolder viewHolder, int position){
             GalleryItem item = mGalleryItems.get(position);
             //viewHolder.bindGalleryItem(item);
-            //Drawable placeHolder = getResources().getDrawable(R.drawable.sean_smile_face, getResources().newTheme());
-            Drawable placeHolder = ContextCompat.getDrawable(getActivity(), R.drawable.sean_smile_face);
-            viewHolder.bindDrawable(placeHolder);
+            //Drawable placeHolder = getResources().getDrawable(R.drawable.sean_smile_face);
+            String title = item.getCaption();
+            //Drawable placeHolder = ContextCompat.getDrawable(getActivity(), R.drawable.plus_pressed);
+            viewHolder.bindDrawable(null, title);
         }
 
         @Override

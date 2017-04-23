@@ -2,7 +2,6 @@ package com.bignerdranch.android.photogallery;
 
 import android.net.Uri;
 import android.util.Log;
-import android.widget.Gallery;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,7 +9,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -110,6 +108,7 @@ public class FlickerFetcher {
         JSONArray photoJsonArray = photosJsonObject.getJSONArray("photo");
         Log.d(TAG, "array size: "+photoJsonArray.length());
 
+        //for(int i = 0; i < 10; i++){
         for(int i = 0; i < photoJsonArray.length(); i++){
             JSONObject photoJsonObject = photoJsonArray.getJSONObject(i);
 
