@@ -1,10 +1,14 @@
 package com.bignerdranch.android.photogallery;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -38,7 +42,16 @@ public class PhotoGalleryFragment extends Fragment {
         setRetainInstance(true);
         new FetchItemsTask().execute();
 
-        mThumbnailDownloader = new ThumbnailDownloader<>();
+        Handler responseHandler = new Handler();
+        mThumbnailDownloader = new ThumbnailDownloader<>(responseHandler);
+        mThumbnailDownloader.setThumbnailDownloadListener(new ThumbnailDownloader.ThumbnailDownloadListener<PhotoHolder>(){
+            @Override
+            public void onThumbnailDownloaded(PhotoHolder photoHolder, Bitmap bitmap){
+                Drawable drawable = new BitmapDrawable(getResources(), bitmap);
+                photoHolder.bindDrawable(drawable);
+            }
+        });
+
         mThumbnailDownloader.start();
         mThumbnailDownloader.getLooper();
         Log.i(TAG, "ThumbnailDownloader Thread started..");
@@ -52,6 +65,12 @@ public class PhotoGalleryFragment extends Fragment {
         mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),3));
         setupAdapter();
         return v;
+    }
+
+    @Override
+    public void onDestroyView(){
+        super.onDestroyView();
+        mThumbnailDownloader.clearQueue();
     }
 
     @Override
@@ -88,7 +107,7 @@ public class PhotoGalleryFragment extends Fragment {
 
         public PhotoHolder(View view){
             super(view);
-            mImageView = (ImageView) view.findViewById(R.id.fragment_photo_gallery_recycler_view);
+            mImageView = (ImageView) view.findViewById(R.id.fragment_photo_gallery_image_view);
             mTitleTextView = (TextView)view.findViewById(R.id.fragment_photo_gallery_text_view);
         }
         public void bindDrawable(Drawable drawable, String title){
@@ -96,6 +115,12 @@ public class PhotoGalleryFragment extends Fragment {
                 mImageView.setImageDrawable(drawable);
             mTitleTextView.setText(title);
             Log.d(TAG, "title : "+title);
+        }
+        public void bindDrawable(Drawable drawable){
+            if(drawable != null) {
+                mImageView.setImageDrawable(drawable);
+                Log.i(TAG, "[bindDrawable] Image (Drawable) has been set.");
+            }
         }
     }
 
@@ -119,8 +144,9 @@ public class PhotoGalleryFragment extends Fragment {
             //viewHolder.bindGalleryItem(item);
             //Drawable placeHolder = getResources().getDrawable(R.drawable.sean_smile_face);
             String title = item.getCaption();
-            //Drawable placeHolder = ContextCompat.getDrawable(getActivity(), R.drawable.plus_pressed);
-            viewHolder.bindDrawable(null, title);
+            Drawable placeHolder = ContextCompat.getDrawable(getActivity(), R.drawable.plus_pressed);
+            viewHolder.bindDrawable(placeHolder, title);
+            mThumbnailDownloader.queueThumbnail(viewHolder, item.getUrl());
         }
 
         @Override
