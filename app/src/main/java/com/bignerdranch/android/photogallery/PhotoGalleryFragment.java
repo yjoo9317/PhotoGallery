@@ -147,6 +147,7 @@ public class PhotoGalleryFragment extends Fragment {
             Drawable placeHolder = ContextCompat.getDrawable(getActivity(), R.drawable.plus_pressed);
             viewHolder.bindDrawable(placeHolder, title);
             mThumbnailDownloader.queueThumbnail(viewHolder, item.getUrl());
+            Log.i(TAG, "[onBindViewHolder] Queued URL: "+item.getUrl());
         }
 
         @Override
