@@ -47,7 +47,8 @@ public class PhotoGalleryFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         setHasOptionsMenu(true);
-        new FetchItemsTask().execute();
+        //new FetchItemsTask().execute();
+        updateItems();
 
         Handler responseHandler = new Handler();
         mThumbnailDownloader = new ThumbnailDownloader<>(responseHandler);
@@ -98,7 +99,8 @@ public class PhotoGalleryFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
             @Override
             public boolean onQueryTextSubmit(String s){
-
+                QueryPreferences.setStoredQuery(getActivity(), s);
+                updateItems();
                 return true;
             }
 
@@ -107,6 +109,31 @@ public class PhotoGalleryFragment extends Fragment {
                 return false;
             }
         });
+
+        searchView.setOnSearchClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                String query = QueryPreferences.getStoredQuery(getActivity());
+                searchView.setQuery(query, false);
+            }
+        });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()){
+            case R.id.menu_item_clear :
+                QueryPreferences.setStoredQuery(getActivity(), null);
+                updateItems();
+                return true;
+            default :
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void updateItems(){
+        String query = QueryPreferences.getStoredQuery(getActivity());
+        new FetchItemsTask(query).execute();
     }
 
     public void setupAdapter(){
@@ -116,14 +143,20 @@ public class PhotoGalleryFragment extends Fragment {
     }
 
     private class FetchItemsTask extends AsyncTask<Void, Void, List<GalleryItem>> {
+
+        private String mQuery;
+
+        public FetchItemsTask(String query){
+            this.mQuery = query;
+        }
+
         @Override
         protected List<GalleryItem> doInBackground(Void... params){
-            String query = "robot";
 
-            if(query == null){
+            if(mQuery == null){
                 return new FlickerFetcher().fetchRecentPhotos();
             } else {
-                return new FlickerFetcher().searchPhotos(query);
+                return new FlickerFetcher().searchPhotos(mQuery);
             }
         }
 
