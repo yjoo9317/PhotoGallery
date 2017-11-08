@@ -195,7 +195,7 @@ public class PhotoGalleryFragment extends Fragment {
             mTitleTextView.setText(item.getCaption());
             Picasso.with(getActivity())
                     .load(item.getUrl())
-                    .placeholder(R.drawable.plus_pressed)
+                    //.placeholder(R.drawable.plus_pressed)
                     .into(mImageView);
         }
     }
@@ -219,8 +219,8 @@ public class PhotoGalleryFragment extends Fragment {
             GalleryItem item = mGalleryItems.get(position);
             //viewHolder.bindGalleryItem(item);
             //Drawable placeHolder = getResources().getDrawable(R.drawable.sean_smile_face);
-            String title = item.getCaption();
-            Drawable placeHolder = ContextCompat.getDrawable(getActivity(), R.drawable.plus_pressed);
+            //String title = item.getCaption();
+            //Drawable placeHolder = ContextCompat.getDrawable(getActivity(), R.drawable.plus_pressed);
             //viewHolder.bindDrawable(placeHolder, title);
             viewHolder.bindGalleryItem(item);
             mThumbnailDownloader.queueThumbnail(viewHolder, item.getUrl());

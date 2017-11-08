@@ -121,7 +121,7 @@ public class FlickerFetcher {
                     .build().toString();*/
 
             String jsonString = getUrlString(url);
-           // Log.i(TAG, "Received JSON: "+jsonString);
+           Log.i(TAG, "Received JSON: "+jsonString);
             JSONObject jsonBody = new JSONObject(jsonString);
             parseItems(items, jsonBody);
         } catch (JSONException je){
@@ -145,6 +145,7 @@ public class FlickerFetcher {
 
             item.setId(photoJsonObject.getString("id"));
             item.setCaption(photoJsonObject.getString("title"));
+            Log.i(TAG, "title: "+item.getCaption());
             if(!photoJsonObject.has("url_s"))
                 continue;
             item.setUrl(photoJsonObject.getString("url_s"));

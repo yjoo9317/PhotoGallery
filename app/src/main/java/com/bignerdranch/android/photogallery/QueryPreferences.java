@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
  */
 
 public class QueryPreferences {
+    private static final String TAG="QueryPreferences";
     private static final String PREF_SEARCH_QUERY = "SEARCH_QUERY";
 
     public static String getStoredQuery(Context context){
