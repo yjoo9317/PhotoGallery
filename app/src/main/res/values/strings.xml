@@ -2,4 +2,8 @@
     <string name="app_name">PhotoGallery</string>
     <string name="search">Search</string>
     <string name="clear_search">Clear</string>
+    <string name="start_polling">Search new pictures</string>
+    <string name="stop_polling">Stop searching</string>
+    <string name="new_pictures_title">New pictures</string>
+    <string name="new_pictures_text">There are new photos in the photo gallery</string>
 </resources>
