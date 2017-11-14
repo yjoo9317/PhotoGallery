@@ -145,7 +145,7 @@ public class FlickerFetcher {
 
             item.setId(photoJsonObject.getString("id"));
             item.setCaption(photoJsonObject.getString("title"));
-            Log.i(TAG, "title: "+item.getCaption());
+            //Log.i(TAG, "title: "+item.getCaption());
             if(!photoJsonObject.has("url_s"))
                 continue;
             item.setUrl(photoJsonObject.getString("url_s"));
